@@ -57,6 +57,6 @@ RUN chmod 0755 /usr/local/bin/run_gotty.sh
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD scheme="http"; curl_args="-sS"; [ "${GOTTY_TLS:-false}" = "true" ] && scheme="https" && curl_args="-k -sS"; status="$(curl $curl_args -o /dev/null -w '%{http_code}' "${scheme}://127.0.0.1:${GOTTY_PORT:-8080}/" || true)"; [ "$status" = "200" ] || [ "$status" = "401" ]
+    CMD ["/bin/bash", "-c", "scheme=http; curl_args=(-sS); if [ \"${GOTTY_TLS:-false}\" = true ]; then scheme=https; curl_args=(-k -sS); fi; status=\"$(curl \"${curl_args[@]}\" -o /dev/null -w '%{http_code}' \"${scheme}://127.0.0.1:${GOTTY_PORT:-8080}/\" || true)\"; [ \"$status\" = 200 ] || [ \"$status\" = 401 ]"]
 
 CMD ["/usr/local/bin/run_gotty.sh"]
